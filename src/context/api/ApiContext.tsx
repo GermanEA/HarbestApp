@@ -33,10 +33,8 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
     }, [])
 
     /**
-     * Función para controlar la autentificación correcta del usuario y guardar localmente los tokens
-     * @author Publyland
-     * @param {string} name - Nombre del usuario
-     * @param {string} pass - Contraseña del usuario
+     * Función para recuperar la lista de productos inicial
+     * @author Germán Estrade
      * @async
      */
     const recoverProductListInit = async () => {

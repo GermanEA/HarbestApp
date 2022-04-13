@@ -4,6 +4,7 @@ import { ProductCard } from '../components/products/ProductCard';
 import { ProductCardHidden } from '../components/products/ProductCardHidden';
 import { ApiContext } from '../context/api/ApiContext';
 import { View, Text } from 'react-native';
+import { EmptyListMessage } from '../components/common/EmptyListMessage';
 
 export const HomeScreen = () => {
 
@@ -14,30 +15,28 @@ export const HomeScreen = () => {
             keyExtractor= { (item, index) => item._id }
             style={{ marginTop: 5 }}
             showsVerticalScrollIndicator={ false }
-            // ListEmptyComponent={ () => <EmptyListMessage message='No hay productos' /> }
+            ListEmptyComponent={ () => <EmptyListMessage message='No hay productos' /> }
             data={ productList.list }
             renderItem={ (item) => 
-                // <ProductCard 
-                //     key={ item.item.SKU }
-                //     item={ item.item } 
-                //     handleOnPress={ () => console.log('pulsando') }
-                // /> 
-                <View>
-                    <Text>{item.item.name}</Text>
-                </View>
+                <ProductCard 
+                    key={ item.item.SKU }
+                    item={ item.item } 
+                    handleOnPress={ () => console.log('pulsando') }
+                />
             }
             renderHiddenItem={ (item) => 
-                // <ProductCardHidden
-                //     id={ item.item.SKU }
-                //     uuid={ item.item.SKU }
-                // />
-                <View>
-                    <Text>{item.item.description}</Text>
-                </View>
+                <ProductCardHidden
+                    id={ item.item._id }
+                    sku={ item.item.SKU }
+                    callbackUpdate={ () => console.log(item.item._id) }
+                    callbackDelete={ () => console.log(item.item._id) }
+                />
             }
-            disableRightSwipe={ true }
-            rightOpenValue={ -190 }
-            stopRightSwipe={ -220 }
+            // disableRightSwipe={ true }
+            leftOpenValue={ 100 }
+            stopLeftSwipe={ 120 }
+            rightOpenValue={ -100 }
+            stopRightSwipe={ -120 }
             // onEndReached={ handleOnEndReached }
             onEndReachedThreshold={ 0.4 }
             // ListFooterComponent={(

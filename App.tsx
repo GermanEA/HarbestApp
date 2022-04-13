@@ -6,11 +6,14 @@ import { Navigator } from './src/navigator/Navigator';
 import Toast from 'react-native-toast-message';
 
 import { ApiProvider } from './src/context/api/ApiContext';
+import { ThemeProvider } from './src/context/theme/ThemeContext';
 
 const AppState = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
   return (
     <ApiProvider>
-      { children }
+      <ThemeProvider>
+        { children }
+      </ThemeProvider>
     </ApiProvider>
   )
 }

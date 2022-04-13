@@ -1,13 +1,10 @@
 import React, { useContext } from 'react';
 import { Pressable, View, StyleSheet, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { Product } from '../../context/api/apiInterfaces';
 
 import { ThemeContext } from '../../context/theme/ThemeContext';
-
-import { getCredentials } from '../../helpers/localStorage';
-import { Product } from '../../context/product/productDetailsInterface';
 import { FadeInImage } from '../common/FadeInImage';
-import { SearchContext } from '../../context/search/SearchContext';
 
 interface Props {
     item: Product,
@@ -16,25 +13,23 @@ interface Props {
 
 /**
  * Tarjeta principal para pintar los detalles de un producto desde el catálogo de productos
- * @author Publyland
+ * @author Germán Estrade
  * @callback handleOnPress - Función para navegar a la pantalla de detalles de un producto
  * @param {Product} item - Objeto con los detalles del producto
  * @see ResultScreen
  */
 export const ProductCard = ( { item, handleOnPress }: Props ) => {
 
-    const baseURL = getCredentials('baseURL');
+    const noImage = '../';
     const { theme } = useContext( ThemeContext );
-    const { handleOnPressAddFav } = useContext( SearchContext );
 
     return (
         <Pressable
             onPress={ handleOnPress }
         >
-            <View style={{ ...styles.productContainer, backgroundColor: theme.globalColors.secondaryBackground }}>
+            <View style={{ ...styles.productContainer, backgroundColor: theme.globalColors.primary }}>
                 <FadeInImage
-                    uri={ baseURL + item.imagen }
-                    key={ item.id }
+                    key={ item._id }
                     style={ styles.productImage }
                     styleView={ styles.productImageView }
                 />
@@ -43,38 +38,23 @@ export const ProductCard = ( { item, handleOnPress }: Props ) => {
                     flex: 1
                 }}>
                     <View style={ styles.productHeader }>
-                        <Text style={{ ...styles.productHeaderText, fontSize: theme.globalFontsSize.large }}>{ item.nombre }</Text>
+                        <Text style={{ ...styles.productHeaderText, fontSize: theme.globalFontsSize.large, color: theme.globalColors.successText }}>{ item.name }</Text>
                         <Pressable
-                            onPress={ () => handleOnPressAddFav(item.id, item.favorito) }
+                            onPress={ () => console.log(item.SKU, item.active) }
                         >
                             <Icon
-                                size={ theme.globalFontsSize.iconLarge25 }
-                                name={ ( !item.favorito || item.favorito === 'true') ? 'heart' : 'heart-outline' }
-                                color={ theme.globalColors.primary }
+                                size={ theme.globalFontsSize.iconLarge }
+                                name={ ( !item.active || item.active === true ) ? 'checkmark' : 'close' }
+                                color={ ( !item.active || item.active === true ) ? theme.globalColors.success : theme.globalColors.danger }
                             />
                         </Pressable>
                     </View>
+                    <View style={ styles.productDescription }>
+                        <Text style={{ fontSize: theme.globalFontsSize.large }}>{ item.description }</Text>
+                    </View>
                     <View style={ styles.productPrize }>
-                        <View style={{ ...styles.productPrizeRow }}>
-                            {
-                                ( item.txtpromo !== '' ) 
-                                    ? <Text style={[
-                                        { ... styles.productTextPromo, color: theme.globalColors.white, fontSize: theme.globalFontsSize.large },
-                                        ( item.txtpromo === 'AHORRO' ) ? { color: theme.globalColors.danger } : { color: theme.globalColors.warning }
-                                    ]}>{ item.txtpromo }</Text> 
-
-                                    : <Text></Text>
-                            }
-                        </View>
-
                         <View style={ styles.productPrizeRow }>
-                            {
-                                ( parseFloat(item.pvptarifa) !== parseFloat(item.pvpneto.replace(',', '.')) ) ? <Text style={{ ...styles.productTextOffer, color: theme.globalColors.priceWarning, fontSize: theme.globalFontsSize.large }}>{ item.pvptarifa } €</Text> : <Text></Text>
-                            }
-                        </View>
-
-                        <View style={ styles.productPrizeRow }>
-                            <Text style={{ ...styles.productTextNet, fontSize: theme.globalFontsSize.large }}>{ item.pvpneto } €</Text>
+                            <Text style={{ ...styles.productTextNet, fontSize: theme.globalFontsSize.large }}>{ item.price } €</Text>
                         </View>
                     </View>
                 </View>
@@ -112,16 +92,19 @@ const styles = StyleSheet.create({
     },
     productHeaderText: {
         flex: 1,
-        marginRight: 5
+        marginRight: 5,
+        fontWeight: 'bold'
+    },
+    productDescription: {
+        width: '100%',
     },
     productPrize: {
-        height: '50%',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-end'
     },
     productPrizeRow: {
-        width: '33%',
+        width: '100%',
         alignItems: 'flex-end'
     },
     productTextPromo: {

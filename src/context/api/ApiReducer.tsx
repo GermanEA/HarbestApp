@@ -13,7 +13,8 @@ export const apiReducer = ( state: ApiState, action: ApiAction ): ApiState => {
             return {
                 ...state,
                 isLoading: false,
-                productList: action.payload.ProductsList
+                productList: action.payload.ProductsList,
+                current_product: action.payload.ProductsList.list[0]
             }
 
         case 'loadingTrue':            

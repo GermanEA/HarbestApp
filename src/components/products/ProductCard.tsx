@@ -20,7 +20,6 @@ interface Props {
  */
 export const ProductCard = ( { item, handleOnPress }: Props ) => {
 
-    const noImage = '../';
     const { theme } = useContext( ThemeContext );
 
     return (
@@ -54,7 +53,7 @@ export const ProductCard = ( { item, handleOnPress }: Props ) => {
                     </View>
                     <View style={ styles.productPrize }>
                         <View style={ styles.productPrizeRow }>
-                            <Text style={{ ...styles.productTextNet, fontSize: theme.globalFontsSize.large }}>{ item.price } €</Text>
+                            <Text style={{ ...styles.productTextNet, fontSize: theme.globalFontsSize.large }}>{ item.price.toFixed(2).replace('.', ',') } €</Text>
                         </View>
                     </View>
                 </View>

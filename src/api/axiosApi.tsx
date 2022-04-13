@@ -7,7 +7,3 @@ import axios from 'axios';
  const axiosApi = axios.create();
 
 export default axiosApi;
-
-const conn = async() => {
-    
-}

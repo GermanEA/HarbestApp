@@ -8,12 +8,14 @@ import axiosApi from '../../api/axiosApi';
 
 /** Interface del objeto que manejará el context */
 export interface ApiState {
+    isLoading: boolean;
     productList: ProductsList;
     current_product: Product;
 }
 
 /** Tipo de las propiedades que expondrá context */
 type ApiContextProps = {
+    isLoading: boolean;
     productList: ProductsList;
     current_product: Product;
     recoverProductListInit: () => Promise<void>
@@ -38,6 +40,7 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
      * @async
      */
     const recoverProductListInit = async () => {
+        dispatch({ type: 'loadingTrue' });
 
         try {
             axiosApi.defaults.baseURL = 'http://10.0.2.2:9000/products';
@@ -53,6 +56,8 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
             });
         } catch (error: any) {
             console.log(error);
+
+            dispatch({ type: 'loadingFalse' });
         }
     }    
     

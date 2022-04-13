@@ -5,9 +5,14 @@ import { createStackNavigator, StackNavigationOptions } from '@react-navigation/
 import SplashScreen from 'react-native-splash-screen';
 
 import { HomeScreen } from '../screens/HomeScreen';
+import { CameraBarCode } from '../screens/camera/CameraBarCode';
+import { Product } from '../context/api/apiInterfaces';
+import { ProductDetailsScreen } from '../screens/product/ProductDetailsScreen';
 
 export type RootStackParams = {
-  HomeScreen: undefined
+  HomeScreen: undefined,
+  ProductDetailsScreen: { product: Product },
+  CameraBarCode: undefined
 }
 
 const Stack = createStackNavigator<RootStackParams>();
@@ -30,6 +35,8 @@ export const Navigator = () => {
         {           
             <>
                 <Stack.Screen name="HomeScreen" component={ HomeScreen } />                 
+                <Stack.Screen name="ProductDetailsScreen" component={ ProductDetailsScreen } />                
+                <Stack.Screen name="CameraBarCode" component={ CameraBarCode } />                 
             </>
         }
       </Stack.Navigator>

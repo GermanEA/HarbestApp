@@ -1,6 +1,7 @@
 import { ApiState } from "./ApiContext";
 
 export const apiInitialState: ApiState = {
+    isLoading: false,
     current_product: {
         _id: '',
         name: '',

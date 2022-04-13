@@ -12,6 +12,7 @@ interface Props {
     isSubtitle: boolean;
     subtitleText: string;
     marginBottom?: number;
+    icon: string;
     navigation: () => void;
 };
 
@@ -25,8 +26,9 @@ interface Props {
  * @param {boolean} isSubtitle - Variable para activar el subtítulo
  * @param {string} subtitleText - Texto del subtítulo
  * @param {number} [marginBottom] - Margen aplicable después del header
+ * @param {string} icon - String con el nombre del icono
  */
-export const CustomHeaderScreens = ( { title, color, colorText, isSubtitle, subtitleText, marginBottom, navigation }: Props ) => {
+export const CustomHeaderScreens = ( { title, color, colorText, isSubtitle, subtitleText, marginBottom, icon, navigation }: Props ) => {
 
     const { theme } = useContext( ThemeContext );
 
@@ -47,7 +49,7 @@ export const CustomHeaderScreens = ( { title, color, colorText, isSubtitle, subt
                     }}>
                         <Icon
                             size={ theme.globalFontsSize.iconLarge }
-                            name='arrow-back-outline'
+                            name={ icon }
                             color={ color }     
                         />
                     </View>

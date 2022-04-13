@@ -1,4 +1,5 @@
 import { ApiState } from "./ApiContext";
+import { ProductCreate } from "./apiInterfaces";
 
 export const apiInitialState: ApiState = {
     isLoading: false,
@@ -14,4 +15,12 @@ export const apiInitialState: ApiState = {
         totalCount: 0,
         list: []
     }
+}
+
+export const initProductCreate: ProductCreate = {
+    SKU: '',
+    name: '',
+    description: '',
+    active: true,
+    price: ''
 }

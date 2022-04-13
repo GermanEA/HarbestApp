@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { KeyboardTypeOptions, Text, StyleSheet, StyleProp, TextStyle, ColorValue } from 'react-native';
+import { KeyboardTypeOptions, Text, StyleSheet, StyleProp, TextStyle, ColorValue, View } from 'react-native';
 import { Switch } from 'react-native-gesture-handler';
 
 import { ThemeContext } from '../../context/theme/ThemeContext';
@@ -33,7 +33,7 @@ export const CustomSwitch = ( { name, trackColor, thumbColor, ios_backgroundColo
     const { theme } = useContext( ThemeContext );
 
     return (
-        <>
+        <View style={ styles.wrapper }>
             {
                 name &&
                     <Text style={{ ...styles.inputName, color: theme.globalColors.primaryText, fontSize: theme.globalFontsSize.large }}>{ name }</Text>
@@ -46,11 +46,16 @@ export const CustomSwitch = ( { name, trackColor, thumbColor, ios_backgroundColo
                 onValueChange={ onValueChange }
                 value={ value }
             />
-        </>
+        </View>
     )
 }
 
 const styles = StyleSheet.create({
+    wrapper: {
+        flexDirection: 'row', 
+        justifyContent: 'center', 
+        alignItems: 'center'
+    },
     inputName: {
         marginBottom: 5
     },

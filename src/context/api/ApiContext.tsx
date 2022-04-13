@@ -20,7 +20,7 @@ type ApiContextProps = {
     isLoading: boolean;
     productList: ProductsList;
     current_product: Product;
-    recoverProductListInit: (page: number, itemsPerPage: number, active?: boolean) => Promise<void>;
+    recoverProductListInit: (active: boolean, page?: number, itemsPerPage?: number) => Promise<void>;
     deleteProduct: (id: string) => Promise<void>;
     updateProduct: (produt: Product) => Promise<void>;
     searchProduct: (_id: string) => Promise<void>;
@@ -37,7 +37,7 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
     const [ state, dispatch ] = useReducer( apiReducer, apiInitialState );
 
     useEffect(() => {
-        recoverProductListInit(0, 10);
+        recoverProductListInit();
     }, [])
 
     /**
@@ -45,7 +45,7 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
      * @author Germán Estrade
      * @async
      */
-    const recoverProductListInit = async (page: number, itemsPerPage: number, active: boolean = true) => {
+    const recoverProductListInit = async (active: boolean = true, page: number = 0, itemsPerPage: number = 5, ) => {
         dispatch({ type: 'loadingTrue' });
 
         try {
@@ -87,7 +87,7 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
                 text1: 'Producto borrado correctamente'
             });
             
-            recoverProductListInit(0, 10);
+            recoverProductListInit();
         } catch (error: any) {
             dispatch({ type: 'loadingFalse' });
 
@@ -119,7 +119,7 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
                 text1: 'Producto actualizado correctamente'
             });
             
-            recoverProductListInit(0, 10);
+            recoverProductListInit();
         } catch (error: any) {
             console.log(error);
             dispatch({ type: 'loadingFalse' });
@@ -150,7 +150,7 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
                 text1: 'Producto creado correctamente'
             });
             
-            recoverProductListInit(0, 10);
+            recoverProductListInit();
         } catch (error: any) {
             console.log(error);
             dispatch({ type: 'loadingFalse' });

@@ -16,6 +16,7 @@ import { RootStackParams } from '../navigator/Navigator';
 import { Product } from '../context/api/apiInterfaces';
 import { CustomInput } from '../components/form/CustomInput';
 import { CustomSwitch } from '../components/form/CustomSwitch';
+import { initProductCreate } from '../context/api/initialStates';
 
 interface Props extends StackScreenProps<RootStackParams, 'HomeScreen'>{};
 
@@ -31,18 +32,10 @@ export interface FormCreate {
     SKU:         string;
 }
 
-const initProductCreate = {
-    SKU: '',
-    name: '',
-    description: '',
-    active: true,
-    price: ''
-}
-
 export const HomeScreen = ({ navigation }: Props) => {
 
     const { theme } = useContext( ThemeContext );
-    const { current_product, productList, isLoading, deleteProduct, updateProduct, searchProduct, createProduct } = useContext(ApiContext);
+    const { current_product, productList, isLoading, deleteProduct, updateProduct, searchProduct, createProduct, recoverProductListInit } = useContext(ApiContext);
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [productUpdate, setProductUpdate] = useState<Product>(current_product);
@@ -55,10 +48,12 @@ export const HomeScreen = ({ navigation }: Props) => {
 
     const [modalVisibleCreate, setModalVisibleCreate] = useState<boolean>(false);
     const [isEnabledCreate, setIsEnabledCreate] = useState<boolean>(true);
-
+    
     const [formCreate, setFormCreate] = useState<FormCreate>(initProductCreate);
-
+    
     const [searchFormState, setSearchFormState] = useState<FilterState>({ principal: '' });
+
+    const [isActive, setIsActive] = useState<boolean>(true);
 
     useEffect(() => {
         setNameForm(productUpdate.name);
@@ -66,6 +61,10 @@ export const HomeScreen = ({ navigation }: Props) => {
         setPriceForm(productUpdate.price.toFixed(2));
         setIsEnabled(productUpdate.active);
     }, [productUpdate])
+
+    useEffect(() => {
+        recoverProductListInit(isActive);
+    }, [isActive])
     
 
     /**
@@ -74,6 +73,7 @@ export const HomeScreen = ({ navigation }: Props) => {
      */
     const handleOnPressSearchingPrincipal = () => {
         if( searchFormState.principal === '' ) {
+
             Toast.show({
                 type: 'error',
                 position: 'bottom',
@@ -81,6 +81,7 @@ export const HomeScreen = ({ navigation }: Props) => {
             });
         } else {
             searchProduct(searchFormState.principal);
+            setSearchFormState({ principal: '' });
         }
     }
 
@@ -95,6 +96,7 @@ export const HomeScreen = ({ navigation }: Props) => {
 
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const toggleSwitchCreate = () => setIsEnabledCreate(previousState => !previousState);
+    const toggleSwitchActive = () => setIsActive(previousState => !previousState);
 
     const handleUpdateProduct = () => {
         setModalVisible(!modalVisible);
@@ -173,6 +175,15 @@ export const HomeScreen = ({ navigation }: Props) => {
                     handleOnChange={ (value) => setSearchFormState({ ...searchFormState, principal: value }) }
                     handleOnPress={ handleOnPressSearchingPrincipal }
                     handleOnPressCamera={ () => navigation.navigate('CameraBarCode') }
+                />
+
+                <CustomSwitch
+                    name={ isActive ? 'Activado' : 'Desactivado' }
+                    trackColor={{ false: theme.globalColors.greyLight, true: theme.globalColors.primary }}
+                    thumbColor={ isEnabled ? theme.globalColors.primaryText : theme.globalColors.greyMedium }
+                    ios_backgroundColor={ theme.globalColors.primaryText }
+                    onValueChange={ toggleSwitchActive }
+                    value={ isActive }
                 />
 
                 {/* Listado de productos */}

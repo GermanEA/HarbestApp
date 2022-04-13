@@ -43,8 +43,8 @@ export const ProductCard = ( { item, handleOnPress }: Props ) => {
                         >
                             <Icon
                                 size={ theme.globalFontsSize.iconLarge }
-                                name={ ( !item.active || item.active === true ) ? 'checkmark' : 'close' }
-                                color={ ( !item.active || item.active === true ) ? theme.globalColors.success : theme.globalColors.danger }
+                                name={ ( item.active === true ) ? 'checkmark' : 'close' }
+                                color={ ( item.active === true ) ? theme.globalColors.success : theme.globalColors.danger }
                             />
                         </Pressable>
                     </View>

@@ -1,8 +1,9 @@
 import React, { useContext } from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 
-import { ThemeContext } from '../../context/theme/ThemeContext';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+import { ThemeContext } from '../../context/theme/ThemeContext';
 
 interface Props {
     message: string;

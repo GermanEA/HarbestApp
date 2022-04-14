@@ -16,7 +16,6 @@ interface Props {
  * @author Germán Estrade
  * @callback handleOnPress - Función para navegar a la pantalla de detalles de un producto
  * @param {Product} item - Objeto con los detalles del producto
- * @see ResultScreen
  */
 export const ProductCard = ( { item, handleOnPress }: Props ) => {
 

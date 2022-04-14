@@ -1,6 +1,5 @@
-import React, { useCallback, useContext, useRef, useState } from 'react'
-import { KeyboardTypeOptions, Platform, TextInput, View, StyleSheet, Pressable, Dimensions, Text } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useContext } from 'react'
+import { KeyboardTypeOptions, Platform, View, StyleSheet, Pressable } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -26,31 +25,21 @@ interface ResultSuggestion {
 
 /**
  * Componente que pinta el buscador principal en el catálogo. El buscador por "contenido-texto".
- * @author Publyland
+ * @author Germán Estrade
  * @callback handleOnChange - Función para setear el estado del input de búsqueda
  * @callback handleOnPress - Función que redirige a la pantalla de resultados
+ * @callback handleOnPressCamera - Función que redirige a la pantalla de la cámara
  * @param {string} value - Valor del input
  * @param {KeyboardTypeOptions} [keyboard] - Tipo de teclado que se mostrará al pinchar dentro del input
  * @param {boolean} [pass] - Activar o no la visibilidad del input tipo password
  * @param {string} [placeholder] - Contenido del placeholder del input
  * @param {number} [length] - Valor máximo del número de caracteres que se pueden insertar en el input
  * @param {'none' | 'sentences' | 'words' | 'characters'} [autoCapitalize]
- * @see CatalogueScreen
- * @see ResultScreen
  */
 export const CatalogueSearcher = ( props: Props ) => {
 
     const { placeholder, keyboard, pass, value, length, autoCapitalize, handleOnChange, handleOnPress, handleOnPressCamera } = props;
     const { theme } = useContext( ThemeContext );
-
-    /**
-     * Función que controla el texto introducido en los "inputs", realiza la llamada para recuperar la lista de sugerencias y establece la altura del cuadro para poder elegir la opción seleccionada
-     * @author Publyland
-     * @param {string} q - Valor insertado en el input
-     */
-    const getSuggestions = useCallback(async (q) => {
-        
-    }, [])
 
     return (
         <View style={ { ...styles.container, backgroundColor: theme.globalColors.primary } }>

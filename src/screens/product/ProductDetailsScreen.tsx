@@ -16,8 +16,7 @@ export const ProductDetailsScreen = ({ route, navigation }: Props) => {
 
     const { product: { SKU, active, description, name, price, _id } } = route.params;
     
-    const { theme } = useContext( ThemeContext );
-     
+    const { theme } = useContext( ThemeContext );     
 
     return (
         <SafeAreaView style={{ ...styles.globalContainer, backgroundColor: theme.globalColors.white }}>

@@ -1,22 +1,25 @@
 import React, { useContext, useEffect, useState } from 'react'
+import { View, Text, StyleSheet, Modal, Pressable, Keyboard } from 'react-native';
+
 import { SwipeListView } from 'react-native-swipe-list-view';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StackScreenProps } from '@react-navigation/stack';
+import Toast from 'react-native-toast-message';
+
+import { ApiContext } from '../context/api/ApiContext';
+import { ThemeContext } from '../context/theme/ThemeContext';
+import { initProductCreate } from '../context/api/initialStates';
+import { Product } from '../context/api/apiInterfaces';
 import { ProductCard } from '../components/products/ProductCard';
 import { ProductCardHidden } from '../components/products/ProductCardHidden';
-import { ApiContext } from '../context/api/ApiContext';
-import { View, Text, StyleSheet, Modal, Pressable, ViewStyle, Keyboard } from 'react-native';
 import { EmptyListMessage } from '../components/common/EmptyListMessage';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ThemeContext } from '../context/theme/ThemeContext';
 import { CustomActivityIndicator } from '../components/common/CustomActivityIndicator';
 import { CustomHeaderScreens } from '../components/common/CustomHeaderScreens';
 import { CatalogueSearcher } from '../components/catalogue/CatalogueSearcher';
-import Toast from 'react-native-toast-message';
-import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParams } from '../navigator/Navigator';
-import { Product } from '../context/api/apiInterfaces';
 import { CustomInput } from '../components/form/CustomInput';
 import { CustomSwitch } from '../components/form/CustomSwitch';
-import { initProductCreate } from '../context/api/initialStates';
+import { Pagination } from '../components/pagination/Pagination';
 
 interface Props extends StackScreenProps<RootStackParams, 'HomeScreen'>{};
 
@@ -35,10 +38,10 @@ export interface FormCreate {
 export const HomeScreen = ({ navigation }: Props) => {
 
     const { theme } = useContext( ThemeContext );
-    const { current_product, productList, isLoading, deleteProduct, updateProduct, searchProduct, createProduct, recoverProductListInit } = useContext(ApiContext);
+    const { filterActive, currentProduct, productList, isLoading, deleteProduct, updateProduct, searchProduct, createProduct, changeFilterActive } = useContext(ApiContext);
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const [productUpdate, setProductUpdate] = useState<Product>(current_product);
+    const [productUpdate, setProductUpdate] = useState<Product>(currentProduct);
 
     const [isEnabled, setIsEnabled] = useState<boolean>(productUpdate.active);
 
@@ -53,8 +56,6 @@ export const HomeScreen = ({ navigation }: Props) => {
     
     const [searchFormState, setSearchFormState] = useState<FilterState>({ principal: '' });
 
-    const [isActive, setIsActive] = useState<boolean>(true);
-
     useEffect(() => {
         setNameForm(productUpdate.name);
         setDescriptionForm(productUpdate.description);
@@ -62,14 +63,9 @@ export const HomeScreen = ({ navigation }: Props) => {
         setIsEnabled(productUpdate.active);
     }, [productUpdate])
 
-    useEffect(() => {
-        recoverProductListInit(isActive);
-    }, [isActive])
-    
-
     /**
-     * Función que redirige a la pantalla de resultados cuando se busca con el buscador principal de texto
-     * @author Publyland
+     * Función que busca un producto por su identificador
+     * @author Germán Estrade
      */
     const handleOnPressSearchingPrincipal = () => {
         if( searchFormState.principal === '' ) {
@@ -86,8 +82,9 @@ export const HomeScreen = ({ navigation }: Props) => {
     }
 
     /**
-     * Función que redirige a la pantalla de resultados cuando se busca con el buscador principal de texto
-     * @author Publyland
+     * Función que setea un producto en el estado para su posterior actualización
+     * @author Germán Estrade
+     * @param {Product} product - Objeto del producto
      */
     const handleOnPressUpdate = (product: Product) => {
         setProductUpdate(product);
@@ -96,8 +93,11 @@ export const HomeScreen = ({ navigation }: Props) => {
 
     const toggleSwitch = () => setIsEnabled(previousState => !previousState);
     const toggleSwitchCreate = () => setIsEnabledCreate(previousState => !previousState);
-    const toggleSwitchActive = () => setIsActive(previousState => !previousState);
 
+    /**
+     * Función que realiza la actualización de un producto
+     * @author Germán Estrade
+     */
     const handleUpdateProduct = () => {
         setModalVisible(!modalVisible);
 
@@ -113,6 +113,18 @@ export const HomeScreen = ({ navigation }: Props) => {
         updateProduct(productToUpdate);
     }
 
+    /**
+     * Función que realiza el borrado de un producto
+     * @author Germán Estrade
+     */
+    const handleOnPressDelete = (id: string) => {
+        deleteProduct(id);
+    }
+
+    /**
+     * Función que realiza la creación de un producto
+     * @author Germán Estrade
+     */
     const handleCreateProduct = () => {
         Keyboard.dismiss();
 
@@ -178,12 +190,12 @@ export const HomeScreen = ({ navigation }: Props) => {
                 />
 
                 <CustomSwitch
-                    name={ isActive ? 'Activado' : 'Desactivado' }
+                    name={ filterActive ? 'Activado' : 'Desactivado' }
                     trackColor={{ false: theme.globalColors.greyLight, true: theme.globalColors.primary }}
-                    thumbColor={ isEnabled ? theme.globalColors.primaryText : theme.globalColors.greyMedium }
+                    thumbColor={ filterActive ? theme.globalColors.primaryText : theme.globalColors.greyMedium }
                     ios_backgroundColor={ theme.globalColors.primaryText }
-                    onValueChange={ toggleSwitchActive }
-                    value={ isActive }
+                    onValueChange={ changeFilterActive }
+                    value={ filterActive }
                 />
 
                 {/* Listado de productos */}
@@ -212,24 +224,21 @@ export const HomeScreen = ({ navigation }: Props) => {
                                     id={ item.item._id }
                                     sku={ item.item.SKU }
                                     callbackUpdate={ () => handleOnPressUpdate(item.item) }
-                                    callbackDelete={ () => deleteProduct(item.item._id) }
+                                    callbackDelete={ () => handleOnPressDelete(item.item._id) }
                                 />
                             }
-                            // disableRightSwipe={ true }
                             leftOpenValue={ 100 }
                             stopLeftSwipe={ 120 }
                             rightOpenValue={ -100 }
                             stopRightSwipe={ -120 }
-                            // onEndReached={ handleOnEndReached }
-                            onEndReachedThreshold={ 0.4 }
-                            // ListFooterComponent={(
-                            //     !endPaginated
-                            //         ? <CustomActivityIndicator size={ 30 } style={{ margin: 10 }}/> 
-                            //         : null
-                            // )}
                         />
                 }
                 </View>
+
+                <Pagination 
+                    isEnabled={ isEnabled }
+                />
+                
 
                 { 
                     modalVisible 
@@ -462,6 +471,16 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         borderRadius: 5,
         justifyContent: 'center',
+        alignItems: 'center'
+    },
+    paginationContainer: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 10
+    },
+    paginationRow: {
+        width: '33%',
         alignItems: 'center'
     }
 });

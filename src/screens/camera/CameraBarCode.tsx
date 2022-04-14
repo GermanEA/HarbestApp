@@ -3,10 +3,11 @@ import { StyleSheet, View, SafeAreaView } from 'react-native';
 
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParams } from '../../navigator/Navigator';
-
 import { BarCodeReadEvent, RNCamera } from 'react-native-camera';
 import Toast from 'react-native-toast-message';
 import BarcodeMask from 'react-native-barcode-mask';
+
+import { ApiContext } from '../../context/api/ApiContext';
 
 interface Props extends StackScreenProps<RootStackParams, 'CameraBarCode'>{};
 
@@ -14,18 +15,18 @@ interface Props extends StackScreenProps<RootStackParams, 'CameraBarCode'>{};
 export const CameraBarCode = ( { navigation }: Props ) => {
 
     const camera = useRef(null);
+    const { currentProduct } = useContext(ApiContext);
 
     /**
      * Función que redirige a la pantalla de resultados con el producto escaneado
-     * @author Publyland
+     * @author Germán Estrade
      * @param {BarCodeReadEvent} event - Objeto con los detalles del evento al capturar el código de barras
      */
     const takeBarCode = async (event: BarCodeReadEvent) => {
         const barCode: string = event.data;
 
         if( barCode !== '' ) {
-            // searchingPrincipal(barCode);
-            // navigation.replace('ResultsScreen');
+            navigation.replace('ProductDetailsScreen', { product: currentProduct });
         } else {
             navigation.goBack();
 

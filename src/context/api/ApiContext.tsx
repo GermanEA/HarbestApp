@@ -1,33 +1,37 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 
-import { apiReducer } from './ApiReducer';
-import { apiInitialState } from './initialStates';
+import Toast from 'react-native-toast-message';
 
-import { Product, ProductsList } from './apiInterfaces';
 import axiosApi from '../../api/axiosApi';
 import baseUrl from '../../api/conecction';
-import Toast from 'react-native-toast-message';
+import { apiReducer } from '../../reducers/ApiReducer';
+import { apiInitialState } from './initialStates';
+import { Product, ProductsList } from './apiInterfaces';
 
 /** Interface del objeto que manejará el context */
 export interface ApiState {
     isLoading: boolean;
+    filterActive: boolean;
     productList: ProductsList;
-    current_product: Product;
+    currentProduct: Product;
+    currentPage: number;
 }
 
 /** Tipo de las propiedades que expondrá context */
 type ApiContextProps = {
     isLoading: boolean;
+    filterActive: boolean;
     productList: ProductsList;
-    current_product: Product;
+    currentProduct: Product;
+    currentPage: number;
     recoverProductListInit: (active: boolean, page?: number, itemsPerPage?: number) => Promise<void>;
     deleteProduct: (id: string) => Promise<void>;
     updateProduct: (produt: Product) => Promise<void>;
     searchProduct: (_id: string) => Promise<void>;
-    createProduct: (product: Product) => Promise<void>
+    createProduct: (product: Product) => Promise<void>;
+    changeFilterActive: () => void;
 }
 
-/** Se utiliza para controlar tanto el sistema de autentificación, como las credenciales y tokens del usuario logueado */
 /** Creación del context */
 export const ApiContext = createContext( {} as ApiContextProps );
 
@@ -40,22 +44,39 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
         recoverProductListInit();
     }, [])
 
+    useEffect(() => {
+        recoverProductListInit(state.filterActive);
+    }, [state.filterActive])
+
+    const changeFilterActive = () => {
+        dispatch({
+            type: 'FILTER_ACTIVE_PRODUCTS',
+            payload: {
+                active: !state.filterActive
+            }
+        })
+    }
+
     /**
      * Función para recuperar la lista de productos inicial
      * @author Germán Estrade
+     * @param {boolean} active - Variable que define si se buscan los productos que estén activos o no
+     * @param {number} page - Número de la página
+     * @param {number} itemsPerPage - Número de productos a recuperar por página
      * @async
      */
-    const recoverProductListInit = async (active: boolean = true, page: number = 0, itemsPerPage: number = 5, ) => {
-        dispatch({ type: 'loadingTrue' });
+    const recoverProductListInit = async (active: boolean = true, page: number = state.currentPage, itemsPerPage: number = 5, ) => {
+        dispatch({ type: 'LOADING_TRUE' });
 
         try {
             axiosApi.defaults.baseURL = baseUrl;
             const resp = await axiosApi.get<ProductsList>(`?page=${ page }&itemsPerPage=${ itemsPerPage }&active=${ active }`);
             
-            dispatch({ 
-                type: 'recoverProductList', 
+            dispatch({
+                type: 'RECOVER_PRODUCT_LIST', 
                 payload: { 
                     ProductsList: resp.data,
+                    currentPage: page
                 } 
             });
         } catch (error: any) {
@@ -65,17 +86,18 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
                 text1: 'Error a la hora de recuperar la lista de productos'
             });
 
-            dispatch({ type: 'loadingFalse' });
+            dispatch({ type: 'LOADING_FALSE' });
         }
     }  
     
     /**
      * Función para borrar un producto
      * @author Germán Estrade
+     * @param {string} id - Id del producto
      * @async
      */
      const deleteProduct = async (id: string) => {
-        dispatch({ type: 'loadingTrue' });
+        dispatch({ type: 'LOADING_TRUE' });
 
         try {
             axiosApi.defaults.baseURL = baseUrl;
@@ -87,9 +109,9 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
                 text1: 'Producto borrado correctamente'
             });
             
-            recoverProductListInit();
+            recoverProductListInit(state.filterActive);
         } catch (error: any) {
-            dispatch({ type: 'loadingFalse' });
+            dispatch({ type: 'LOADING_FALSE' });
 
             Toast.show({
                 type: 'error',
@@ -102,10 +124,11 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
     /**
      * Función para actualizar un producto
      * @author Germán Estrade
+     * @param {Product} product - Objeto del producto
      * @async
      */
      const updateProduct = async ( { _id, name, description, active, price }: Product ) => {
-        dispatch({ type: 'loadingTrue' });
+        dispatch({ type: 'LOADING_TRUE' });
 
         try {
             axiosApi.defaults.baseURL = baseUrl;
@@ -119,10 +142,10 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
                 text1: 'Producto actualizado correctamente'
             });
             
-            recoverProductListInit();
+            recoverProductListInit(state.filterActive);
         } catch (error: any) {
             console.log(error);
-            dispatch({ type: 'loadingFalse' });
+            dispatch({ type: 'LOADING_FALSE' });
 
             Toast.show({
                 type: 'error',
@@ -135,10 +158,11 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
     /**
      * Función para crear un producto
      * @author Germán Estrade
+     * @param {Product} product - Objeto del producto
      * @async
      */
      const createProduct = async ( { name, description, active, price, SKU }: Product ) => {
-        dispatch({ type: 'loadingTrue' });
+        dispatch({ type: 'LOADING_TRUE' });
 
         try {
             axiosApi.defaults.baseURL = baseUrl;
@@ -150,10 +174,10 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
                 text1: 'Producto creado correctamente'
             });
             
-            recoverProductListInit();
+            recoverProductListInit(state.filterActive);
         } catch (error: any) {
             console.log(error);
-            dispatch({ type: 'loadingFalse' });
+            dispatch({ type: 'LOADING_FALSE' });
 
             Toast.show({
                 type: 'error',
@@ -166,28 +190,31 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
     /**
      * Función para buscar un producto
      * @author Germán Estrade
+     * @param {string} id - Id del producto
      * @async
      */
-    const searchProduct = async (  _id: string ) => {
-        dispatch({ type: 'loadingTrue' });
+    const searchProduct = async (  id: string ) => {
+        dispatch({ type: 'LOADING_TRUE' });
 
         try {
             axiosApi.defaults.baseURL = baseUrl;
-            const resp = await axiosApi.get<Product>(`/${ _id }`);
+            const resp = await axiosApi.get<Product>(`/${ id }`);
 
             dispatch({ 
-                type: 'recoverProductList', 
+                type: 'RECOVER_PRODUCT_LIST', 
                 payload: { 
                     ProductsList: {
                         list: [resp.data],
-                        totalCount: 1
+                        totalCount: 1,
+                        nextPage: 0
                     },
+                    currentPage: 0
                 } 
             });
             
         } catch (error: any) {
             console.log(error);
-            dispatch({ type: 'loadingFalse' });
+            dispatch({ type: 'LOADING_FALSE' });
 
             Toast.show({
                 type: 'error',
@@ -204,7 +231,8 @@ export const ApiProvider = ({ children }: { children: JSX.Element | JSX.Element[
             deleteProduct,
             updateProduct,
             searchProduct,
-            createProduct
+            createProduct,
+            changeFilterActive
         }}>
             { children }
         </ApiContext.Provider>

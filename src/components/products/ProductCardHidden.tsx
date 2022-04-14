@@ -1,5 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, Pressable } from 'react-native';
+import React, { useContext } from 'react';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ThemeContext } from '../../context/theme/ThemeContext';
@@ -14,11 +14,10 @@ interface Props {
 /**
  * Tarjeta secundaria para pintar las opciones de añadir cantidad y agregar un producto
  * @author Germán Estrade
- * @callback callbackUpdate - Función para borrar un producto
- * @callback callbackDelete - Función para actualizar un producto
+ * @callback callbackUpdate - Función para actualizar un producto
+ * @callback callbackDelete - Función para borrar un producto
  * @param {string} id - Identificador del producto
  * @param {string} sku - SKU del producto
- * @see ResultScreen
  */
 export const ProductCardHidden = ( { id, sku, callbackDelete, callbackUpdate }: Props ) => {
 

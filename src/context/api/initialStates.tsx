@@ -3,7 +3,9 @@ import { ProductCreate } from "./apiInterfaces";
 
 export const apiInitialState: ApiState = {
     isLoading: false,
-    current_product: {
+    filterActive: true,
+    currentPage: 0,
+    currentProduct: {
         _id: '',
         name: '',
         description: '',
@@ -13,7 +15,8 @@ export const apiInitialState: ApiState = {
     },
     productList: {
         totalCount: 0,
-        list: []
+        list: [],
+        nextPage: 0
     }
 }
 

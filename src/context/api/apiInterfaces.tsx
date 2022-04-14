@@ -10,6 +10,7 @@ export interface Product {
 export interface ProductsList {
     totalCount: number;
     list:       Product[];
+    nextPage: number;
 }
 
 export interface ProductCreate {
